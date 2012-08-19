@@ -25,5 +25,6 @@ extern unsigned int __logs_level;
 #define LMSG(MSG) do { __LOG(MSG, true);               } while (0)
 #define LWRN(MSG) do { __LOG(MSG, true);               } while (0)
 #define LERR(MSG) do { __LOG(MSG, true);               } while (0)
+#define LCRT(MSG) do { __LOG(MSG, true);               } while (0)
 
 #endif
