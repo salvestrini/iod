@@ -7,7 +7,8 @@
 bin_PROGRAMS = iod
 
 iod_SOURCES =					\
-	logs.cc logs.hh				\
+	logs.cc  logs.hh			\
+	utils.cc utils.hh			\
 	iod.cc
 
 iod_CPPFLAGS = -Wall -Werror -Wextra -Wundef
