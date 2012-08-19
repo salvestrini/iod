@@ -1,1 +1,4 @@
-/*.h.in
+/config.h
+/config.h.in
+
+/iod

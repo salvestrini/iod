@@ -12,7 +12,7 @@ AC_INIT([iod],
 
 AC_PREREQ([2.68])
 
-AC_CONFIG_HEADERS([src/config-auto.h])
+AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
