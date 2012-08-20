@@ -5,6 +5,11 @@
 #ifndef UTILS_HH
 #define UTILS_HH
 
-#define BUG()
+#include <string>
+
+void bug(const std::string & file,
+         int                 line);
+
+#define BUG() bug(__FILE__, __LINE__)
 
 #endif

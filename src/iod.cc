@@ -8,7 +8,9 @@
 #include <sstream>
 #include <cassert>
 
+#if HAVE_GETOPT_H
 #include <getopt.h>
+#endif
 
 #include "logs.hh"
 #include "utils.hh"
@@ -64,7 +66,6 @@ std::string help(const std::string & executable)
 
 void terminate_handler()
 {
-        LCRT("A call to terminate() has been performed ...");
         BUG();
 }
 
@@ -81,6 +82,7 @@ bool parse_options(int argc, char * argv[])
 {
         LDBG("Parsing command line options ...");
 
+#if HAVE_GETOPT_H
         struct option long_options[] = {
                 { "quiet",          no_argument, 0, 'q' },
                 { "lousy",          no_argument, 0, 'l' },
@@ -121,6 +123,7 @@ bool parse_options(int argc, char * argv[])
         if (optind < argc) {
                 LWRN("Discarding unhandled option(s) ...");
         }
+#endif
 
         LDBG("Options parsing complete");
         return true;

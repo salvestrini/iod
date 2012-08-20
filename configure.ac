@@ -44,6 +44,21 @@ AC_PROG_CXX
 AC_PROG_CXX_C_O
 AC_PROG_RANLIB
 
+AC_CHECK_HEADER([getopt.h],[
+    AC_DEFINE([HAVE_GETOPT_H], 1,
+              [Define to 1 if you have <getopt.h>.])
+],[
+    AC_MSG_ERROR([Your system seems to be missing of getopt.h header])
+])
+
+AC_CHECK_HEADER([execinfo.h],[
+    AC_DEFINE([HAVE_EXECINFO_H], 1,
+              [Define to 1 if you have <execinfo.h>.])
+    AC_CHECK_FUNCS([backtrace backtrace_symbols])
+],[
+    AC_MSG_NOTICE([Your system seems to be missing of execinfo.h header, you will not have debugging backtraces"])
+])
+
 AC_CONFIG_FILES([
     Makefile
 
