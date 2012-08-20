@@ -8,10 +8,11 @@
 #include <iostream>
 
 extern const char * __logs_prefix;
-extern unsigned int __logs_level;
+extern int          __logs_level;
 
-#define LOG_SET_PREFIX(PFX) do { __logs_prefix = PFX; } while (0)
-#define LOG_SET_LEVEL(LVL)  do { __logs_level  = LVL; } while (0)
+#define LOGS_SET_PREFIX(PFX) do { __logs_prefix = PFX; } while (0)
+#define LOGS_GET_LEVEL()     __logs_level
+#define LOGS_SET_LEVEL(LVL)  do { __logs_level = LVL;  } while (0)
 
 #define __LOG(MSG, COND)                                                \
 	do {                                                            \
