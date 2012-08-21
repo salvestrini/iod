@@ -11,5 +11,8 @@ iod_SOURCES =					\
 	utils.cc utils.hh			\
 	iod.cc
 
-iod_CPPFLAGS = -Wall -Werror -Wextra -Wundef
+iod_CPPFLAGS =					\
+	-Wall -Werror -Wextra -Wundef		\
+	-DSYSCONFDIR=\"${sysconfdir}\"
+
 iod_CXXFLAGS =

@@ -15,7 +15,10 @@
 #include "logs.hh"
 #include "utils.hh"
 
-#define PROGRAM_NAME "iod"
+#define PROGRAM_NAME               "iod"
+#define DEFAULT_CONFIGURATION_FILE SYSCONFDIR "/" PROGRAM_NAME
+
+std::string configuration_file = std::string(DEFAULT_CONFIGURATION_FILE);
 
 std::string hint(const std::string & executable,
                  const std::string & message)
@@ -48,13 +51,17 @@ std::string help(const std::string & executable)
            << std::endl;
         ss << std::endl;
 
-        ss << "  -h, --help   " + sep + "print this help, then exit"
+        ss << "  -h, --help         " + sep + "print this help, then exit"
            << std::endl;
-        ss << "  -v, --version" + sep + "print version, then exit"
+        ss << "  -v, --version      " + sep + "print version, then exit"
            << std::endl;
-        ss << "  -q, --quiet  " + sep + "decrease logs verbosity"
+        ss << "  -q, --quiet        " + sep + "decrease logs verbosity"
            << std::endl;
-        ss << "  -l, --lousy  " + sep + "increase logs verbosity"
+        ss << "  -l, --lousy        " + sep + "increase logs verbosity"
+           << std::endl;
+        ss << "  -c, --configuration" + sep + "set configuration file"
+           << std::endl
+           << "                     " + sep + "(default " + quote(configuration_file) + ")"
            << std::endl;
 
         ss << std::endl;
@@ -69,15 +76,6 @@ void terminate_handler()
         BUG();
 }
 
-std::string quote(const std::string & s)
-{
-        std::stringstream ss;
-
-        ss << "`" << s << "'";
-
-        return ss.str();
-}
-
 bool parse_options(int argc, char * argv[])
 {
         LDBG("Parsing command line options ...");
@@ -89,6 +87,8 @@ bool parse_options(int argc, char * argv[])
                 { "help",           no_argument, 0, 'h' },
                 { "version",        no_argument, 0, 'v' },
 
+                { "configuration",  no_argument, 0, 'c' },
+
                 { 0,                0,           0, 0   }
         };
 
@@ -98,6 +98,10 @@ bool parse_options(int argc, char * argv[])
                                   "qlhv",
                                   long_options, 0)) != -1) {
                 switch (opt) {
+                        case 'c':
+                                assert(optarg != 0);
+                                configuration_file = std::string(optarg);
+                                break;
                         case 'q':
                                 LOGS_SET_LEVEL(LOGS_GET_LEVEL() - 1);
                                 break;
@@ -129,9 +133,19 @@ bool parse_options(int argc, char * argv[])
         return true;
 }
 
+bool parse_configuration(const std::string & filename)
+{
+        LDBG("Parsing configuration file " + quote(filename));
+
+        return false;
+}
+
 bool core(int argc, char * argv[])
 {
         if (!parse_options(argc, argv))
+                return false;
+
+        if (!parse_configuration(configuration_file))
                 return false;
 
         LVRB(PROGRAM_NAME << " " << PACKAGE_VERSION << " starting ...");

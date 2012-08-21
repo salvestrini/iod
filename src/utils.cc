@@ -17,6 +17,13 @@
 
 #define MAX_BACKTRACE_FRAMES 200
 
+//std::list<std::string> backtrace()
+//{
+//        std::list<std::string> tmp;
+//
+//        return tmp;
+//}
+
 void bug(const std::string & file,
          int                 line)
 {
@@ -47,4 +54,13 @@ void bug(const std::string & file,
         LCRT("Please report this bug to <" << PACKAGE_BUGREPORT << ">");
 
         abort();
+}
+
+std::string quote(const std::string & s)
+{
+        std::stringstream ss;
+
+        ss << "`" << s << "'";
+
+        return ss.str();
 }
