@@ -135,6 +135,13 @@ bool parse_options(int argc, char * argv[])
         return true;
 }
 
+bool parse_line(const std::string & line)
+{
+        LDBG("Parsing line " + quote(line) + "");
+
+        return true;
+}
+
 bool parse_configuration(const std::string & filename)
 {
         LVRB("Parsing configuration file " + quote(filename));
@@ -150,13 +157,17 @@ bool parse_configuration(const std::string & filename)
                 std::string line;
 
                 std::getline(ifs, line);
+                line = trim(line, std::string(" "));
+                if (line.empty())
+                        continue;
 
-                LDBG("Got line " + quote(line) + "");
+                if (!parse_line(line))
+                        return false;
         }
 
-        LDBG("COnfiguration file parsing complete");
+        LDBG("Configuration file parsing complete");
 
-        return false;
+        return true;
 }
 
 bool core(int argc, char * argv[])
