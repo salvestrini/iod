@@ -21,8 +21,8 @@ extern int          __logs_level;
 				  << std::endl;                         \
 	} while (0)
 
-#define LDBG(MSG) do { __LOG(MSG, (__logs_level > 2)); } while (0)
-#define LVRB(MSG) do { __LOG(MSG, (__logs_level > 1)); } while (0)
+#define LDBG(MSG) do { __LOG(MSG, (__logs_level > 1)); } while (0)
+#define LVRB(MSG) do { __LOG(MSG, (__logs_level > 0)); } while (0)
 #define LMSG(MSG) do { __LOG(MSG, true);               } while (0)
 #define LWRN(MSG) do { __LOG(MSG, true);               } while (0)
 #define LERR(MSG) do { __LOG(MSG, true);               } while (0)
