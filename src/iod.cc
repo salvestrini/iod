@@ -9,6 +9,8 @@
 #include <cstdlib>
 #include <sstream>
 #include <cassert>
+#include <map>
+#include <set>
 
 #if HAVE_GETOPT_H
 #include <getopt.h>
@@ -84,20 +86,20 @@ bool parse_options(int argc, char * argv[])
 
 #if HAVE_GETOPT_H
         struct option long_options[] = {
-                { "quiet",          no_argument, 0, 'q' },
-                { "lousy",          no_argument, 0, 'l' },
-                { "help",           no_argument, 0, 'h' },
-                { "version",        no_argument, 0, 'v' },
+                { "help",           no_argument,       0, 'h' },
+                { "version",        no_argument,       0, 'v' },
 
-                { "configuration",  no_argument, 0, 'c' },
+                { "quiet",          no_argument,       0, 'q' },
+                { "lousy",          no_argument,       0, 'l' },
+                { "configuration",  required_argument, 0, 'c' },
 
-                { 0,                0,           0, 0   }
+                { 0,                0,                 0, 0   }
         };
 
         opterr = 0;
         int opt;
         while ((opt = getopt_long(argc, argv,
-                                  "qlhv",
+                                  "qlc:hv",
                                   long_options, 0)) != -1) {
                 switch (opt) {
                         case 'c':
@@ -170,6 +172,25 @@ bool parse_configuration(const std::string & filename)
         return true;
 }
 
+std::map<std::string, std::string> inputs;
+std::map<std::string, std::string> outputs;
+std::set<std::string>              functions;
+
+bool check_consistency()
+{
+        if (inputs.size() == 0) {
+                LERR("No inputs defined");
+                return false;
+        }
+
+        if (outputs.size() == 0) {
+                LERR("No outputs defined");
+                return false;
+        }
+
+        return true;
+}
+
 bool core(int argc, char * argv[])
 {
         LVRB(PROGRAM_NAME << " " << PACKAGE_VERSION << " starting ...");
@@ -178,6 +199,9 @@ bool core(int argc, char * argv[])
                 return false;
 
         if (!parse_configuration(configuration_file))
+                return false;
+
+        if (!check_consistency())
                 return false;
 
         LVRB(PROGRAM_NAME << " " << PACKAGE_VERSION << " started");

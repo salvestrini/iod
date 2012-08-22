@@ -6,6 +6,9 @@
 
 bin_PROGRAMS = iod
 
+EXTRA_DIST =					\
+	iod.conf
+
 iod_SOURCES =					\
 	logs.cc  logs.hh			\
 	utils.cc utils.hh			\
