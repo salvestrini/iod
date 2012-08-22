@@ -144,7 +144,10 @@ bool parse_line(const std::string & line)
         return true;
 }
 
-bool parse_configuration(const std::string & filename)
+bool parse_configuration(const std::string &                  filename,
+                         std::map<std::string, std::string> & inputs,
+                         std::map<std::string, std::string> & outputs,
+                         std::set<std::string> &              functions)
 {
         LVRB("Parsing configuration file " + quote(filename));
 
@@ -165,28 +168,13 @@ bool parse_configuration(const std::string & filename)
 
                 if (!parse_line(line))
                         return false;
+
+                (void) inputs;
+                (void) outputs;
+                (void) functions;
         }
 
         LDBG("Configuration file parsing complete");
-
-        return true;
-}
-
-std::map<std::string, std::string> inputs;
-std::map<std::string, std::string> outputs;
-std::set<std::string>              functions;
-
-bool check_consistency()
-{
-        if (inputs.size() == 0) {
-                LERR("No inputs defined");
-                return false;
-        }
-
-        if (outputs.size() == 0) {
-                LERR("No outputs defined");
-                return false;
-        }
 
         return true;
 }
@@ -198,11 +186,30 @@ bool core(int argc, char * argv[])
         if (!parse_options(argc, argv))
                 return false;
 
-        if (!parse_configuration(configuration_file))
+        std::map<std::string, std::string> inputs;
+        std::map<std::string, std::string> outputs;
+        std::set<std::string>              functions;
+
+        if (!parse_configuration(configuration_file,
+                                 inputs,
+                                 outputs,
+                                 functions))
                 return false;
 
-        if (!check_consistency())
+        if (inputs.size() == 0) {
+                LERR("No inputs defined");
                 return false;
+        }
+
+        if (outputs.size() == 0) {
+                LERR("No outputs defined");
+                return false;
+        }
+
+        if (functions.size() == 0) {
+                LERR("No functions defined");
+                return false;
+        }
 
         LVRB(PROGRAM_NAME << " " << PACKAGE_VERSION << " started");
 
