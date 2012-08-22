@@ -4,6 +4,8 @@
 
 #include "config.h"
 
+#include <fstream>
+#include <iostream>
 #include <cstdlib>
 #include <sstream>
 #include <cassert>
@@ -16,7 +18,7 @@
 #include "utils.hh"
 
 #define PROGRAM_NAME               "iod"
-#define DEFAULT_CONFIGURATION_FILE SYSCONFDIR "/" PROGRAM_NAME
+#define DEFAULT_CONFIGURATION_FILE SYSCONFDIR "/" PROGRAM_NAME ".conf"
 
 std::string configuration_file = std::string(DEFAULT_CONFIGURATION_FILE);
 
@@ -78,7 +80,7 @@ void terminate_handler()
 
 bool parse_options(int argc, char * argv[])
 {
-        LDBG("Parsing command line options ...");
+        LVRB("Parsing command line options ...");
 
 #if HAVE_GETOPT_H
         struct option long_options[] = {
@@ -135,20 +137,40 @@ bool parse_options(int argc, char * argv[])
 
 bool parse_configuration(const std::string & filename)
 {
-        LDBG("Parsing configuration file " + quote(filename));
+        LVRB("Parsing configuration file " + quote(filename));
+
+        std::ifstream ifs;
+        ifs.open(filename.c_str());
+        if (!ifs) {
+                LERR("Cannot open file " + quote(filename) + " for reading");
+                return false;
+        }
+
+        while (!ifs.eof()) {
+                std::string line;
+
+                std::getline(ifs, line);
+
+                LDBG("Got line " + quote(line) + "");
+        }
+
+        LDBG("COnfiguration file parsing complete");
 
         return false;
 }
 
 bool core(int argc, char * argv[])
 {
+        LVRB(PROGRAM_NAME << " " << PACKAGE_VERSION << " starting ...");
+
         if (!parse_options(argc, argv))
                 return false;
 
         if (!parse_configuration(configuration_file))
                 return false;
 
-        LVRB(PROGRAM_NAME << " " << PACKAGE_VERSION << " starting ...");
+        LVRB(PROGRAM_NAME << " " << PACKAGE_VERSION << " started");
+
         LVRB("Stopped!");
 
         return true;
@@ -171,6 +193,8 @@ int main(int argc, char * argv[])
         }
 
         LDBG("Stopped");
+        if (retval != EXIT_SUCCESS)
+                LDBG("Exiting with error code " + tostring(EXIT_SUCCESS));
 
         return retval;
 }

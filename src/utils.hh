@@ -13,5 +13,6 @@ void bug(const std::string & file,
 #define BUG() bug(__FILE__, __LINE__)
 
 std::string quote(const std::string & s);
+std::string tostring(int n);
 
 #endif

@@ -64,3 +64,12 @@ std::string quote(const std::string & s)
 
         return ss.str();
 }
+
+std::string tostring(int n)
+{
+        std::stringstream ss;
+
+        ss << n;
+
+        return ss.str();
+}
