@@ -4,5 +4,5 @@
 
 #include "logs.hh"
 
-int          __logs_level  = 0;
+int          __logs_level  = LOGS_LEVEL_DEFAULT;
 const char * __logs_prefix = "<UNKNOWN>";

@@ -11,6 +11,7 @@
 #include <cassert>
 #include <map>
 #include <set>
+#include <list>
 
 #if HAVE_GETOPT_H
 #include <getopt.h>
@@ -107,10 +108,10 @@ bool parse_options(int argc, char * argv[])
                                 configuration_file = std::string(optarg);
                                 break;
                         case 'q':
-                                LOGS_SET_LEVEL(LOGS_GET_LEVEL() - 1);
+                                LOGS_LEVEL_SET(LOGS_LEVEL_GET() - 1);
                                 break;
                         case 'l':
-                                LOGS_SET_LEVEL(LOGS_GET_LEVEL() + 1);
+                                LOGS_LEVEL_SET(LOGS_LEVEL_GET() + 1);
                                 break;
                         case 'h':
                                 std::cout << help(argv[0]);
@@ -129,7 +130,10 @@ bool parse_options(int argc, char * argv[])
         }
 
         if (optind < argc) {
-                LWRN("Discarding unhandled option(s) ...");
+                std::string tmp;
+                for (int i = optind; i < argc; i++)
+                        tmp = tmp + argv[i] + ((i != (argc - 1)) ? " " : "");
+                LWRN("Discarding unhandled option(s) " + quote(tmp) + "");
         }
 #endif
 
@@ -168,11 +172,16 @@ bool parse_configuration(const std::string &                  filename,
 
                 if (!parse_line(line))
                         return false;
-
-                (void) inputs;
-                (void) outputs;
-                (void) functions;
         }
+
+        LDBG("Inputs:");
+        (void) inputs;
+
+        LDBG("Outputs:");
+        (void) outputs;
+
+        LDBG("Functions:");
+        (void) functions;
 
         LDBG("Configuration file parsing complete");
 
@@ -220,8 +229,8 @@ bool core(int argc, char * argv[])
 
 int main(int argc, char * argv[])
 {
-        LOGS_SET_PREFIX(PROGRAM_NAME);
-        // LOGS_SET_LEVEL(100);
+        LOGS_PREFIX_SET(PROGRAM_NAME);
+        LOGS_LEVEL_SET(LOGS_LEVEL_DEFAULT);
 
         LDBG("Starting ...");
 
