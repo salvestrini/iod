@@ -141,9 +141,15 @@ bool parse_options(int argc, char * argv[])
         return true;
 }
 
-bool parse_line(const std::string & line)
+bool parse_line(const std::string & l)
 {
+        std::string line(l);
+
         LDBG("Parsing line " + quote(line) + "");
+
+        line = trim(l, std::string(" "));
+        if (line.empty())
+                return true;
 
         return true;
 }
@@ -166,10 +172,6 @@ bool parse_configuration(const std::string &                  filename,
                 std::string line;
 
                 std::getline(ifs, line);
-                line = trim(line, std::string(" "));
-                if (line.empty())
-                        continue;
-
                 if (!parse_line(line))
                         return false;
         }
