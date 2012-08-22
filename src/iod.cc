@@ -56,17 +56,23 @@ std::string help(const std::string & executable)
            << std::endl;
         ss << std::endl;
 
-        ss << "  -h, --help         " + sep + "print this help, then exit"
+        ss << "  -h, --help         " + sep
+           << "print this help, then exit"
            << std::endl;
-        ss << "  -v, --version      " + sep + "print version, then exit"
+        ss << "  -v, --version      " + sep
+           << "print version, then exit"
            << std::endl;
-        ss << "  -q, --quiet        " + sep + "decrease logs verbosity"
+        ss << "  -q, --quiet        " + sep
+           << "decrease logs verbosity"
            << std::endl;
-        ss << "  -l, --lousy        " + sep + "increase logs verbosity"
+        ss << "  -l, --lousy        " + sep
+           << "increase logs verbosity"
            << std::endl;
-        ss << "  -c, --configuration" + sep + "set configuration file"
+        ss << "  -c, --configuration" + sep
+           << "set configuration file"
            << std::endl
-           << "                     " + sep + "(default " + quote(configuration_file) + ")"
+           << "                     " + sep
+           << "(default " + quote(configuration_file) + ")"
            << std::endl;
 
         ss << std::endl;
@@ -115,10 +121,10 @@ bool parse_options(int argc, char * argv[])
                                 break;
                         case 'h':
                                 std::cout << help(argv[0]);
-                                return true;
+                                return true; // XXX FIXME: It doesn't halt
                         case 'v':
                                 std::cout << version() << std::endl;
-                                return true;
+                                return true; // XXX FIXME: It doesn't halt
                         default:
                                 assert(argv[optind - 1] != 0);
                                 std::string err =
@@ -133,7 +139,7 @@ bool parse_options(int argc, char * argv[])
                 std::string tmp;
                 for (int i = optind; i < argc; i++)
                         tmp = tmp + argv[i] + ((i != (argc - 1)) ? " " : "");
-                LWRN("Discarding unhandled option(s) " + quote(tmp) + "");
+                LWRN("Discarding unhandled option(s) " + quote(tmp));
         }
 #endif
 
@@ -145,9 +151,16 @@ bool parse_line(const std::string & l)
 {
         std::string line(l);
 
-        LDBG("Parsing line " + quote(line) + "");
+        LDBG("Parsing line " + quote(line));
 
-        line = trim(l, std::string(" "));
+        line = line.erase(line.find_first_of("#"));
+
+        LDBG("Line without comments is " + quote(line));
+
+        line = trim(line, std::string(" \t"));
+
+        LDBG("Line without whitespaces/tabs " + quote(line));
+
         if (line.empty())
                 return true;
 
