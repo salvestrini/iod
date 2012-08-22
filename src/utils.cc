@@ -73,3 +73,23 @@ std::string tostring(int n)
 
         return ss.str();
 }
+
+std::string trim_left(const std::string & s,
+                      const std::string & t)
+{
+        std::string tmp(s);
+
+        return tmp.erase(0, tmp.find_first_not_of(t));
+}
+
+std::string trim_right(const std::string & s,
+                       const std::string & t)
+{
+        std::string tmp(s);
+
+        return tmp.erase(tmp.find_last_not_of(t) + 1);
+}
+
+std::string trim(const std::string & s,
+                 const std::string & t)
+{ return trim_left(trim_right(s, t), t); }
