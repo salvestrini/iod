@@ -179,23 +179,33 @@ bool parse_options(int argc, char * argv[], bool & goon)
 #endif
 }
 
-bool parse_line(const std::string & l)
+bool parse_line(const std::string &                  line,
+                std::map<std::string, std::string> & inputs,
+                std::map<std::string, std::string> & outputs,
+                std::set<std::string> &              functions)
 {
-        std::string line(l);
+        std::string l(line);
 
-        LDBG("Parsing line " + quote(line));
+        LDBG("Parsing line " + quote(l));
 
-        line = line.erase(line.find_first_of("#"));
+#if 0
+        l = l.erase(l.find_first_of("#"));
 
-        LDBG("Line without comments is " + quote(line));
+        LDBG("Line without comments is " + quote(l));
 
-        line = trim(line, std::string(" \t"));
+        l = trim(l, std::string(" \t"));
 
-        LDBG("Line without whitespaces/tabs " + quote(line));
+        LDBG("Line without whitespaces/tabs " + quote(l));
 
-        if (line.empty())
+        if (l.empty())
                 return true;
+#endif
 
+        (void) inputs;
+        (void) outputs;
+        (void) functions;
+
+        LDBG("Line parsed successfully");
         return true;
 }
 
@@ -217,20 +227,37 @@ bool parse_configuration(const std::string &                  filename,
                 std::string line;
 
                 std::getline(ifs, line);
-                if (!parse_line(line))
+                if (!parse_line(line, inputs, outputs, functions))
                         return false;
         }
 
-        LDBG("Inputs:");
-        (void) inputs;
-
-        LDBG("Outputs:");
-        (void) outputs;
-
-        LDBG("Functions:");
-        (void) functions;
-
         LDBG("Configuration file parsing complete");
+
+        {
+                LVRB("Configuration:");
+
+                std::string sep1("  ");
+                std::string sep2("    ");
+
+                LVRB(sep1 << "Inputs:");
+                for (std::map<std::string, std::string>::const_iterator iter =
+                             inputs.begin();
+                     iter != inputs.end();
+                     iter++)
+                        LVRB(sep2 << (*iter).first);
+                LVRB(sep1 << "Outputs:");
+                for (std::map<std::string, std::string>::const_iterator iter =
+                             outputs.begin();
+                     iter != outputs.end();
+                     iter++)
+                        LVRB(sep2 << (*iter).first);
+                LVRB(sep1 << "Functions:");
+                for (std::set<std::string>::const_iterator iter =
+                             functions.begin();
+                     iter != functions.end();
+                     iter++)
+                        LVRB(sep2 << *iter);
+        }
 
         return true;
 }
@@ -257,29 +284,6 @@ bool core(int argc, char * argv[])
                                  outputs,
                                  functions))
                 return false;
-
-        {
-                std::string sep("  ");
-
-                LVRB("Inputs:");
-                for (std::map<std::string, std::string>::const_iterator iter =
-                             inputs.begin();
-                     iter != inputs.end();
-                     iter++)
-                        LVRB(sep << (*iter).first);
-                LVRB("Outputs:");
-                for (std::map<std::string, std::string>::const_iterator iter =
-                             outputs.begin();
-                     iter != outputs.end();
-                     iter++)
-                        LVRB(sep << (*iter).first);
-                LVRB("Functions:");
-                for (std::set<std::string>::const_iterator iter =
-                             functions.begin();
-                     iter != functions.end();
-                     iter++)
-                        LVRB(sep << *iter);
-        }
 
         if (inputs.size() == 0) {
                 LERR("No inputs defined");
