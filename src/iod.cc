@@ -239,12 +239,14 @@ bool core(int argc, char * argv[])
 {
         LVRB(PROGRAM_NAME << " " << PACKAGE_VERSION << " starting ...");
 
-        bool goon;
+        {
+                bool goon;
 
-        if (!parse_options(argc, argv, goon))
-                return false;
-        if (!goon)
-                return true;
+                if (!parse_options(argc, argv, goon))
+                        return false;
+                if (!goon)
+                        return true;
+        }
 
         std::map<std::string, std::string> inputs;
         std::map<std::string, std::string> outputs;
@@ -255,6 +257,29 @@ bool core(int argc, char * argv[])
                                  outputs,
                                  functions))
                 return false;
+
+        {
+                std::string sep("  ");
+
+                LVRB("Inputs:");
+                for (std::map<std::string, std::string>::const_iterator iter =
+                             inputs.begin();
+                     iter != inputs.end();
+                     iter++)
+                        LVRB(sep << (*iter).first);
+                LVRB("Outputs:");
+                for (std::map<std::string, std::string>::const_iterator iter =
+                             outputs.begin();
+                     iter != outputs.end();
+                     iter++)
+                        LVRB(sep << (*iter).first);
+                LVRB("Functions:");
+                for (std::set<std::string>::const_iterator iter =
+                             functions.begin();
+                     iter != functions.end();
+                     iter++)
+                        LVRB(sep << *iter);
+        }
 
         if (inputs.size() == 0) {
                 LERR("No inputs defined");
@@ -283,8 +308,6 @@ int main(int argc, char * argv[])
         LOGS_PREFIX_SET(PROGRAM_NAME);
         LOGS_LEVEL_SET(LOGS_LEVEL_DEFAULT);
 
-        LDBG("Starting ...");
-
         std::set_terminate(terminate_handler);
 
         int retval;
@@ -294,9 +317,8 @@ int main(int argc, char * argv[])
                 retval = EXIT_FAILURE;
         }
 
-        LDBG("Stopped");
         if (retval != EXIT_SUCCESS)
-                LDBG("Exiting with error code " + tostring(EXIT_SUCCESS));
+                LDBG("Exiting with error code " + tostring(retval));
 
         return retval;
 }
