@@ -88,9 +88,11 @@ void terminate_handler()
         BUG("Called terminate_handler() ...");
 }
 
-bool parse_options(int argc, char * argv[])
+bool parse_options(int argc, char * argv[], bool & goon)
 {
         LVRB("Parsing command line options ...");
+
+        goon = true;
 
 #if HAVE_GETOPT_H
         struct option long_options[] = {
@@ -147,10 +149,12 @@ bool parse_options(int argc, char * argv[])
                                 break;
                         case 'h':
                                 std::cout << help(argv[0]);
-                                exit(EXIT_SUCCESS);
+                                goon = false;
+                                return true;
                         case 'v':
                                 std::cout << version() << std::endl;
-                                exit(EXIT_SUCCESS);
+                                goon = false;
+                                return true;
                         default:
                                 ASSERT(argv[optind - 1] != 0);
                                 std::string err =
@@ -235,8 +239,12 @@ bool core(int argc, char * argv[])
 {
         LVRB(PROGRAM_NAME << " " << PACKAGE_VERSION << " starting ...");
 
-        if (!parse_options(argc, argv))
+        bool goon;
+
+        if (!parse_options(argc, argv, goon))
                 return false;
+        if (!goon)
+                return true;
 
         std::map<std::string, std::string> inputs;
         std::map<std::string, std::string> outputs;
