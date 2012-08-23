@@ -188,18 +188,23 @@ bool parse_line(const std::string &                  line,
 
         LDBG("Parsing line " + quote(l));
 
-#if 0
-        l = l.erase(l.find_first_of("#"));
-
-        LDBG("Line without comments is " + quote(l));
+        {
+                std::string::size_type comment_position(l.find_first_of("#"));
+                if (comment_position != std::string::npos) {
+                        LDBG("Removing comment");
+                        l = l.erase(comment_position);
+                        LDBG("Line without comments is " + quote(l));
+                }
+        }
 
         l = trim(l, std::string(" \t"));
 
         LDBG("Line without whitespaces/tabs " + quote(l));
 
-        if (l.empty())
+        if (l.empty()) {
+                LDBG("Line is empty, bailing out");
                 return true;
-#endif
+        }
 
         (void) inputs;
         (void) outputs;
