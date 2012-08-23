@@ -10,7 +10,10 @@
 extern const char * __logs_prefix;
 extern int          __logs_level;
 
-#define LOGS_LEVEL_DEFAULT   0
+#define LOGS_LEVEL_MIN                  0
+#define LOGS_LEVEL_MAX                  2
+#define LOGS_LEVEL_DEFAULT LOGS_LEVEL_MIN
+
 #define LOGS_PREFIX_SET(PFX) do { __logs_prefix = PFX; } while (0)
 #define LOGS_LEVEL_GET()     __logs_level
 #define LOGS_LEVEL_SET(LVL)  do { __logs_level = LVL;  } while (0)

@@ -66,6 +66,9 @@ std::string help(const std::string & executable)
         ss << "  -l, --lousy        " + sep
            << "increase logs verbosity"
            << std::endl;
+        ss << "  -d, --debug        " + sep
+           << "set logging level to the maximum"
+           << std::endl;
         ss << "  -c, --configuration" + sep
            << "set configuration file"
            << std::endl
@@ -94,6 +97,7 @@ bool parse_options(int argc, char * argv[])
                 { "help",           no_argument,       0, 'h' },
                 { "version",        no_argument,       0, 'v' },
 
+                { "debug",          no_argument,       0, 'd' },
                 { "quiet",          no_argument,       0, 'q' },
                 { "lousy",          no_argument,       0, 'l' },
                 { "configuration",  required_argument, 0, 'c' },
@@ -104,18 +108,41 @@ bool parse_options(int argc, char * argv[])
         opterr = 0;
         int opt;
         while ((opt = getopt_long(argc, argv,
-                                  "qlc:hv",
+                                  "dqlc:hv",
                                   long_options, 0)) != -1) {
                 switch (opt) {
                         case 'c':
                                 ASSERT(optarg == 0);
                                 configuration_file = std::string(optarg);
                                 break;
+                        case 'd':
+                                LOGS_LEVEL_SET(LOGS_LEVEL_MAX);
+                                LDBG("Logs level set to " <<
+                                     tostring(LOGS_LEVEL_GET()));
+                                break;
                         case 'q':
+                                if (LOGS_LEVEL_GET() <= LOGS_LEVEL_MIN) {
+                                        LWRN("Logs level won't be decreased "
+                                             "anymore, minimum reached");
+                                        LOGS_LEVEL_SET(LOGS_LEVEL_MIN);
+                                        break;
+                                }
+
                                 LOGS_LEVEL_SET(LOGS_LEVEL_GET() - 1);
+                                LDBG("Logs level set to " <<
+                                     tostring(LOGS_LEVEL_GET()));
                                 break;
                         case 'l':
+                                if (LOGS_LEVEL_GET() >= LOGS_LEVEL_MAX) {
+                                        LWRN("Logs level won't be increased "
+                                             "anymore, maximum reached");
+                                        LOGS_LEVEL_SET(LOGS_LEVEL_MAX);
+                                        break;
+                                }
+
                                 LOGS_LEVEL_SET(LOGS_LEVEL_GET() + 1);
+                                LDBG("Logs level set to " <<
+                                     tostring(LOGS_LEVEL_GET()));
                                 break;
                         case 'h':
                                 std::cout << help(argv[0]);
