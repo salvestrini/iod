@@ -11,6 +11,11 @@
 #include <map>
 #include <set>
 
+#if HAVE_REGEX_H
+#include <sys/types.h>
+#include <regex.h>
+#endif
+
 #if HAVE_GETOPT_H
 #include <getopt.h>
 #endif
@@ -205,6 +210,69 @@ bool parse_line(const std::string &                  line,
                 LDBG("Line is empty, bailing out");
                 return true;
         }
+
+#if HAVE_REGEX_H
+        {
+                LDBG("Regexing ...");
+
+                regex_t regex_input;
+                regex_t regex_output;
+                regex_t regex_function;
+
+                int rc;
+
+                std::string regex;
+
+                regex = "define ([a-zA-Z][a-zA-Z0-9]*) as input";
+                LDBG("Regex compiling " + quote(regex));
+                rc = regcomp(&regex_input, regex.c_str(), REG_ICASE);
+
+                if (rc != 0) {
+                        char buffer[1000];
+                        regerror(rc,
+                                 &regex_input,
+                                 buffer,
+                                 1000);
+                        LERR(buffer);
+                }
+
+                ASSERT(rc == 0);
+
+                regex = "define ([a-zA-Z][a-zA-Z0-9]*) as output";
+                LDBG("Regex compiling " + quote(regex));
+                rc = regcomp(&regex_output, regex.c_str(), REG_ICASE);
+
+                if (rc != 0) {
+                        char buffer[1000];
+                        size_t x = regerror(rc,
+                                            &regex_input,
+                                            buffer,
+                                            1000);
+                        if (x) LERR(buffer);
+                }
+
+                ASSERT(rc == 0);
+
+                regex = "if \\(.*\\) then set (.*) to (.*)";
+                LDBG("Regex compiling " + quote(regex));
+                rc = regcomp(&regex_function, regex.c_str(), REG_ICASE);
+
+                if (rc != 0) {
+                        char buffer[1000];
+                        size_t x = regerror(rc,
+                                            &regex_input,
+                                            buffer,
+                                            1000);
+                        if (x) LERR(buffer);
+                }
+
+                ASSERT(rc == 0);
+
+                regfree(&regex_input);
+                regfree(&regex_output);
+                regfree(&regex_function);
+        }
+#endif
 
         (void) inputs;
         (void) outputs;
