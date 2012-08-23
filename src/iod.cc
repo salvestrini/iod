@@ -108,7 +108,7 @@ bool parse_options(int argc, char * argv[])
                                   long_options, 0)) != -1) {
                 switch (opt) {
                         case 'c':
-                                BUG_IF(optarg == 0);
+                                ASSERT(optarg == 0);
                                 configuration_file = std::string(optarg);
                                 break;
                         case 'q':
@@ -124,7 +124,7 @@ bool parse_options(int argc, char * argv[])
                                 std::cout << version() << std::endl;
                                 return true; // XXX FIXME: It doesn't halt
                         default:
-                                BUG_IF(argv[optind - 1] != 0);
+                                ASSERT(argv[optind - 1] != 0);
                                 std::string err =
                                         std::string("Unknown argument ") +
                                         quote(argv[optind - 1]);

@@ -17,9 +17,9 @@ std::string quote(const std::string & s);
 
 #define _STR(X) #X
 
-#define BUG_IF(COND)                                                    \
+#define ASSERT(COND)                                                    \
 	do {                                                            \
-		if (!(COND))                                            \
+		if (COND)                                               \
 			BUG("Assertion '" _STR(COND) "' failed");       \
 	} while (0);
 
