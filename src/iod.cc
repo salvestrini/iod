@@ -147,10 +147,10 @@ bool parse_options(int argc, char * argv[])
                                 break;
                         case 'h':
                                 std::cout << help(argv[0]);
-                                return true; // XXX FIXME: It doesn't halt
+                                exit(EXIT_SUCCESS);
                         case 'v':
                                 std::cout << version() << std::endl;
-                                return true; // XXX FIXME: It doesn't halt
+                                exit(EXIT_SUCCESS);
                         default:
                                 ASSERT(argv[optind - 1] != 0);
                                 std::string err =
