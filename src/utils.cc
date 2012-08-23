@@ -19,13 +19,6 @@
 
 #define MAX_BACKTRACE_FRAMES 200
 
-//std::list<std::string> backtrace()
-//{
-//        std::list<std::string> tmp;
-//
-//        return tmp;
-//}
-
 std::list<std::string> backtrace()
 {
         std::list<std::string> tmp;
@@ -46,7 +39,7 @@ std::list<std::string> backtrace()
                 free(strings);
         }
 #else
-        LMSG("Backtrace support is not available ...");
+        LWRN("Backtrace support is not available ...");
 #endif
 
         return tmp;
