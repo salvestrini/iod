@@ -45,6 +45,8 @@ std::list<std::string> backtrace()
 
                 free(strings);
         }
+#else
+        LMSG("Backtrace support is not available ...");
 #endif
 
         return tmp;
@@ -57,14 +59,10 @@ void bug(const std::string & file,
         LCRT("A bug has been detected in "
              << file << ":" << line << ": " << message);
 
-        std::list<std::string> tmp(backtrace());
-
         LCRT("");
-        if (tmp.size() == 0)
-                LCRT("Empty backtrace ...");
-        else {
+        std::list<std::string> tmp(backtrace());
+        if (tmp.size() != 0) {
                 LCRT("Backtrace (" << tmp.size() << " stack frames):");
-
                 for (std::list<std::string>::const_iterator iter = tmp.begin();
                      iter != tmp.end();
                      iter++)

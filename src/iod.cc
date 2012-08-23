@@ -208,8 +208,6 @@ bool core(int argc, char * argv[])
         if (!parse_options(argc, argv))
                 return false;
 
-        BUG_IF(false);
-
         std::map<std::string, std::string> inputs;
         std::map<std::string, std::string> outputs;
         std::set<std::string>              functions;
