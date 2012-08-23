@@ -100,6 +100,7 @@ bool parse_options(int argc, char * argv[])
                 { "debug",          no_argument,       0, 'd' },
                 { "quiet",          no_argument,       0, 'q' },
                 { "lousy",          no_argument,       0, 'l' },
+
                 { "configuration",  required_argument, 0, 'c' },
 
                 { 0,                0,                 0, 0   }
@@ -166,10 +167,12 @@ bool parse_options(int argc, char * argv[])
                         tmp = tmp + argv[i] + ((i != (argc - 1)) ? " " : "");
                 LWRN("Discarding unhandled option(s) " + quote(tmp));
         }
-#endif
 
         LDBG("Options parsing complete");
         return true;
+#else
+#error Missing getopt support ...
+#endif
 }
 
 bool parse_line(const std::string & l)
