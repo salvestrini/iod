@@ -6,6 +6,8 @@
 
 #include <sstream>
 #include <cstdlib>
+#include <list>
+#include <string>
 
 #if HAVE_EXECINFO_H
 #include <execinfo.h>
@@ -24,10 +26,10 @@
 //        return tmp;
 //}
 
-void bug(const std::string & file,
-         int                 line)
+std::list<std::string> backtrace()
 {
-        LCRT("A bug has been detected in " << file << ":" << line);
+        std::list<std::string> tmp;
+
 #if HAVE_BACKTRACE && HAVE_BACKTRACE_SYMBOLS
         void *  array[MAX_BACKTRACE_FRAMES];
         size_t  size;
@@ -38,21 +40,42 @@ void bug(const std::string & file,
         strings = backtrace_symbols(array, size);
 
         if (strings) {
-                LCRT("");
-                LCRT("Backtrace (" << size << " stack frames):");
                 for (i = 0; i < size; i++)
-                        LCRT("  " << strings[i]);
-                LCRT("");
+                        tmp.push_back(strings[i]);
 
                 free(strings);
-        } else
-                LERR("Cannot retrieve backtrace ...");
-#else
-        LCRT("Backtrace unavailable (missing support)");
+        }
 #endif
+
+        return tmp;
+}
+
+void bug(const std::string & file,
+         int                 line,
+         const std::string & message)
+{
+        LCRT("A bug has been detected in "
+             << file << ":" << line << ": " << message);
+
+        std::list<std::string> tmp(backtrace());
+
+        LCRT("");
+        if (tmp.size() == 0)
+                LCRT("Empty backtrace ...");
+        else {
+                LCRT("Backtrace (" << tmp.size() << " stack frames):");
+
+                for (std::list<std::string>::const_iterator iter = tmp.begin();
+                     iter != tmp.end();
+                     iter++)
+                        LCRT("  " << *iter);
+        }
+        LCRT("");
 
         LCRT("Please report this bug to <" << PACKAGE_BUGREPORT << ">");
 
+        LCRT("");
+        LCRT("Process is going to terminate abruptly ...");
         abort();
 }
 

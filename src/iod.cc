@@ -8,10 +8,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
-#include <cassert>
 #include <map>
 #include <set>
-#include <list>
 
 #if HAVE_GETOPT_H
 #include <getopt.h>
@@ -84,7 +82,7 @@ std::string help(const std::string & executable)
 
 void terminate_handler()
 {
-        BUG();
+        BUG("Called terminate_handler() ...");
 }
 
 bool parse_options(int argc, char * argv[])
@@ -110,7 +108,7 @@ bool parse_options(int argc, char * argv[])
                                   long_options, 0)) != -1) {
                 switch (opt) {
                         case 'c':
-                                assert(optarg != 0);
+                                BUG_IF(optarg == 0);
                                 configuration_file = std::string(optarg);
                                 break;
                         case 'q':
@@ -126,7 +124,7 @@ bool parse_options(int argc, char * argv[])
                                 std::cout << version() << std::endl;
                                 return true; // XXX FIXME: It doesn't halt
                         default:
-                                assert(argv[optind - 1] != 0);
+                                BUG_IF(argv[optind - 1] != 0);
                                 std::string err =
                                         std::string("Unknown argument ") +
                                         quote(argv[optind - 1]);
@@ -209,6 +207,8 @@ bool core(int argc, char * argv[])
 
         if (!parse_options(argc, argv))
                 return false;
+
+        BUG_IF(false);
 
         std::map<std::string, std::string> inputs;
         std::map<std::string, std::string> outputs;

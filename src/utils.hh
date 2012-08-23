@@ -7,12 +7,22 @@
 
 #include <string>
 
-void bug(const std::string & file,
-         int                 line);
-
-#define BUG() bug(__FILE__, __LINE__)
+void        bug(const std::string & file,
+                int                 line,
+                const std::string & message);
 
 std::string quote(const std::string & s);
+
+#define BUG(MSG) bug(__FILE__, __LINE__, MSG)
+
+#define _STR(X) #X
+
+#define BUG_IF(COND)                                                    \
+	do {                                                            \
+		if (!(COND))                                            \
+			BUG("Assertion '" _STR(COND) "' failed");       \
+	} while (0);
+
 std::string tostring(int n);
 
 std::string trim_left(const std::string & s,
