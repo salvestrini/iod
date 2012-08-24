@@ -120,7 +120,7 @@ bool parse_options(int argc, char * argv[], bool & goon)
                                   long_options, 0)) != -1) {
                 switch (opt) {
                         case 'c':
-                                ASSERT(optarg == 0);
+                                ASSERT(optarg != 0);
                                 configuration_file = std::string(optarg);
                                 break;
                         case 'd':
@@ -184,6 +184,23 @@ bool parse_options(int argc, char * argv[], bool & goon)
 #endif
 }
 
+#if HAVE_REGEX_H
+#define ERROR_BUFFER_SIZE 512
+
+std::string tostring(regex_t * regex, int errcode)
+{
+        ASSERT(regex != 0);
+        ASSERT(errcode != 0);
+
+        char buffer[ERROR_BUFFER_SIZE];
+
+        size_t s = regerror(errcode, regex, buffer, ERROR_BUFFER_SIZE);
+        ASSERT(s <= ERROR_BUFFER_SIZE);
+
+        return std::string(buffer);
+}
+#endif
+
 bool parse_line(const std::string &                  line,
                 std::map<std::string, std::string> & inputs,
                 std::map<std::string, std::string> & outputs,
@@ -219,54 +236,54 @@ bool parse_line(const std::string &                  line,
                 regex_t regex_output;
                 regex_t regex_function;
 
-                int rc;
-
+                int         rc;
                 std::string regex;
 
-                regex = "define ([a-zA-Z][a-zA-Z0-9]*) as input";
-                LDBG("Regex compiling " + quote(regex));
+                regex = "define[ \t]+([a-zA-Z][a-zA-Z0-9]*)[ \t]+as[ \t]+input";
+                LDBG("Compiling regex " + quote(regex));
                 rc = regcomp(&regex_input, regex.c_str(), REG_ICASE);
-
-                if (rc != 0) {
-                        char buffer[1000];
-                        regerror(rc,
-                                 &regex_input,
-                                 buffer,
-                                 1000);
-                        LERR(buffer);
-                }
-
+                BUG_IF(rc != 0, tostring(&regex_input, rc));
                 ASSERT(rc == 0);
 
-                regex = "define ([a-zA-Z][a-zA-Z0-9]*) as output";
-                LDBG("Regex compiling " + quote(regex));
+                regex = "define[ \t]+([a-zA-Z][a-zA-Z0-9]*)[ \t]+as[ \t]+output";
+                LDBG("Compiling regex " + quote(regex));
                 rc = regcomp(&regex_output, regex.c_str(), REG_ICASE);
-
-                if (rc != 0) {
-                        char buffer[1000];
-                        size_t x = regerror(rc,
-                                            &regex_input,
-                                            buffer,
-                                            1000);
-                        if (x) LERR(buffer);
-                }
-
+                BUG_IF(rc != 0, tostring(&regex_output, rc));
                 ASSERT(rc == 0);
 
-                regex = "if \\(.*\\) then set (.*) to (.*)";
-                LDBG("Regex compiling " + quote(regex));
+                regex = "if[ \t]+\\(.*\\)[ \t]+then[ \t]+set[ \t]+(.*)[ \t]+to[ \t]+(.*)";
+                LDBG("Compiling regex " + quote(regex));
                 rc = regcomp(&regex_function, regex.c_str(), REG_ICASE);
+                BUG_IF(rc != 0, tostring(&regex_output, rc));
+                ASSERT(rc == 0);
 
-                if (rc != 0) {
-                        char buffer[1000];
-                        size_t x = regerror(rc,
-                                            &regex_input,
-                                            buffer,
-                                            1000);
-                        if (x) LERR(buffer);
+#define REGEX_MAX_MATCHES 5
+
+                regmatch_t matches[REGEX_MAX_MATCHES];
+
+                if (regexec(&regex_input,
+                            line.c_str(),
+                            REGEX_MAX_MATCHES,
+                            matches,
+                            0) == 0) {
+                        LDBG("Got match on input");
                 }
 
-                ASSERT(rc == 0);
+                if (regexec(&regex_output,
+                            line.c_str(),
+                            REGEX_MAX_MATCHES,
+                            matches,
+                            0) == 0) {
+                        LDBG("Got match on output");
+                }
+
+                if (regexec(&regex_function,
+                            line.c_str(),
+                            REGEX_MAX_MATCHES,
+                            matches,
+                            0) == 0) {
+                        LDBG("Got match on function");
+                }
 
                 regfree(&regex_input);
                 regfree(&regex_output);
