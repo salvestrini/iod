@@ -13,9 +13,12 @@ void        bug(const std::string & file,
 
 std::string quote(const std::string & s);
 
-#define BUG(MSG) bug(__FILE__, __LINE__, MSG)
-
 #define _STR(X) #X
+
+#define BUG(MSG) \
+	do { bug(__FILE__, __LINE__, MSG); } while (0)
+#define BUG_IF(COND, MSG) \
+	do { if (COND) bug(__FILE__, __LINE__, MSG); } while (0)
 
 #define ASSERT(COND)                                                    \
 	do {                                                            \
