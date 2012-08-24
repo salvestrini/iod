@@ -10,8 +10,9 @@ EXTRA_DIST =					\
 	iod.conf
 
 iod_SOURCES =					\
-	logs.cc  logs.hh			\
-	utils.cc utils.hh			\
+	logs.cc          logs.hh		\
+	utils.cc         utils.hh		\
+	configuration.cc configuration.hh	\
 	iod.cc
 
 iod_CPPFLAGS =					\
