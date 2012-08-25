@@ -6,7 +6,6 @@
 #include "utils.hh"
 #include "regex.hh"
 
-
 #if HAVE_REGEX_H
 #define ERROR_BUFFER_SIZE 512
 
@@ -47,11 +46,11 @@ void regex::compile(const char * expression)
         ASSERT(rc == 0);
 }
 
-std::list<std::string> regex::matches(const std::string & input)
+std::vector<std::string> regex::matches(const std::string & input)
 {
         LDBG("Matching " << quote(input) << " against regex buffer");
 
-        std::list<std::string> tmp;
+        std::vector<std::string> tmp;
 
         if (regexec(&buffer_,
                     input.c_str(),

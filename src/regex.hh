@@ -12,7 +12,7 @@
 #include <regex.h>
 #endif
 
-#include <list>
+#include <vector>
 #include <string>
 
 #define REGEX_MAX_MATCHES 5
@@ -23,7 +23,7 @@ public:
         regex(const std::string & expression);
         virtual ~regex();
 
-        std::list<std::string> matches(const std::string & input);
+        std::vector<std::string> matches(const std::string & input);
 
 private:
         void compile(const char * expression);
