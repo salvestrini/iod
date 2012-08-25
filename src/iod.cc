@@ -191,9 +191,9 @@ bool core(int argc, char * argv[])
                         return true;
         }
 
-        std::map<std::string, std::string> inputs;
-        std::map<std::string, std::string> outputs;
-        std::set<std::string>              functions;
+        std::set<std::string> inputs;
+        std::set<std::string> outputs;
+        std::set<std::string> functions;
 
         if (!parse_configuration(configuration_file,
                                  inputs,

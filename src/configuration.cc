@@ -32,23 +32,10 @@ std::string clean_line(const std::string & line)
         return l;
 }
 
-void dump_matches(const std::string &          header,
-                  const std::list<std::string> matches)
-{
-        LDBG("Got matches on " << header << ":");
-        size_t count = 0;
-        for (std::list<std::string>::const_iterator i = matches.begin();
-             i != matches.end();
-             i++) {
-                LDBG("  " << tostring(count) << " "<< quote(*i));
-                count++;
-        }
-}
-                        
-bool parse_configuration(const std::string &                  filename,
-                         std::map<std::string, std::string> & inputs,
-                         std::map<std::string, std::string> & outputs,
-                         std::set<std::string> &              functions)
+bool parse_configuration(const std::string &     filename,
+                         std::set<std::string> & inputs,
+                         std::set<std::string> & outputs,
+                         std::set<std::string> & functions)
 {
         LVRB("Parsing configuration file " + quote(filename));
 
@@ -77,23 +64,56 @@ bool parse_configuration(const std::string &                  filename,
                         continue;
                 }
 
-                std::list<std::string> matches;
+                std::vector<std::string> matches;
 
                 matches = regex_input.matches(line);
                 if (!matches.empty()) {
-                        dump_matches("input", matches);
+                        ASSERT(matches.size() == 2);
+
+                        std::string input = matches.at(1);
+
+                        if (inputs.find(input) != inputs.end()) {
+                                LERR("Input "     <<
+                                     quote(input) <<
+                                     " already defined");
+                                return false;
+                        }
+
+                        inputs.insert(input);
                         continue;
                 }
 
                 matches = regex_output.matches(line);
                 if (!matches.empty()) {
-                        dump_matches("output", matches);
+                        ASSERT(matches.size() == 2);
+
+                        std::string output = matches.at(1);
+
+                        if (outputs.find(output) != outputs.end()) {
+                                LERR("Output "     <<
+                                     quote(output) <<
+                                     " already defined");
+                                return false;
+                        }
+
+                        outputs.insert(output);
                         continue;
                 }
 
                 matches = regex_function.matches(line);
                 if (!matches.empty()) {
-                        dump_matches("function", matches);
+                        ASSERT(matches.size() == 4);
+
+                        std::string function = matches.at(1);
+#if 0
+                        if (functions.find(function) != functions.end()) {
+                                LERR("Function "     <<
+                                     quote(function) <<
+                                     " already defined");
+                                return false;
+                        }
+#endif
+                        functions.insert(function);
                         continue;
                 }
 
@@ -113,17 +133,17 @@ bool parse_configuration(const std::string &                  filename,
                 std::string sep2("    ");
 
                 LVRB(sep1 << "Inputs:");
-                for (std::map<std::string, std::string>::const_iterator iter =
+                for (std::set<std::string>::const_iterator iter =
                              inputs.begin();
                      iter != inputs.end();
                      iter++)
-                        LVRB(sep2 << (*iter).first);
+                        LVRB(sep2 << *iter);
                 LVRB(sep1 << "Outputs:");
-                for (std::map<std::string, std::string>::const_iterator iter =
+                for (std::set<std::string>::const_iterator iter =
                              outputs.begin();
                      iter != outputs.end();
                      iter++)
-                        LVRB(sep2 << (*iter).first);
+                        LVRB(sep2 << *iter);
                 LVRB(sep1 << "Functions:");
                 for (std::set<std::string>::const_iterator iter =
                              functions.begin();
