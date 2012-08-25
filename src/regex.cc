@@ -49,7 +49,7 @@ void regex::compile(const char * expression)
 
 std::list<std::string> regex::matches(const std::string & input)
 {
-        LDBG("Matching input " << quote(input) << "against regex buffer");
+        LDBG("Matching " << quote(input) << " against regex buffer");
 
         std::list<std::string> tmp;
 
@@ -59,17 +59,21 @@ std::list<std::string> regex::matches(const std::string & input)
                     matches_,
                     0) == 0) {
                 LDBG("Got matches:");
-                for (size_t i = 0; i < REGEX_MAX_MATCHES; i++)
+                for (size_t i = 0; i < REGEX_MAX_MATCHES; i++) {
+                        std::string s(input.c_str() + matches_[i].rm_so,
+                                      (matches_[i].rm_eo - matches_[i].rm_so));
                         if (matches_[i].rm_so != -1) {
-                                LDBG("  "  << tostring(i) << "  " 
-                                     "so=" << tostring(matches_[i].rm_so) <<
-                                     ", "  <<
-                                     "eo=" << tostring(matches_[i].rm_eo));
-                                std::string s(input.c_str()[matches_[i].rm_so],
-                                              (matches_[i].rm_eo -
-                                               matches_[i].rm_so));
+                                LDBG("  "   << tostring(i) << "  "
+                                     "so="  << tostring(matches_[i].rm_so) <<
+                                     ", "   <<
+                                     "eo="  << tostring(matches_[i].rm_eo) <<
+                                     ", "   <<
+                                     "str=" << quote(s));
                                 tmp.push_back(s);
-                        }x
+                        }
+                }
+        } else {
+                LDBG("No match!");
         }
 
         return tmp;

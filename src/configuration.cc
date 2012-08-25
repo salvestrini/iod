@@ -36,10 +36,13 @@ void dump_matches(const std::string &          header,
                   const std::list<std::string> matches)
 {
         LDBG("Got matches on " << header << ":");
+        size_t count = 0;
         for (std::list<std::string>::const_iterator i = matches.begin();
              i != matches.end();
-             i++)
-                LDBG("  " << *i);
+             i++) {
+                LDBG("  " << tostring(count) << " "<< quote(*i));
+                count++;
+        }
 }
                         
 bool parse_configuration(const std::string &                  filename,
