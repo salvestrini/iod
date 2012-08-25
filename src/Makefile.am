@@ -12,6 +12,7 @@ EXTRA_DIST =					\
 iod_SOURCES =					\
 	logs.cc          logs.hh		\
 	utils.cc         utils.hh		\
+	regex.cc         regex.hh		\
 	configuration.cc configuration.hh	\
 	iod.cc
 

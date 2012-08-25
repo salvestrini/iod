@@ -4,34 +4,13 @@
 
 #include "config.h"
 
-#if HAVE_REGEX_H
-#include <sys/types.h>
-#include <regex.h>
-#endif
-
 #include <fstream>
 #include <iostream>
 
 #include "logs.hh"
 #include "utils.hh"
 #include "configuration.hh"
-
-#if HAVE_REGEX_H
-#define ERROR_BUFFER_SIZE 512
-
-std::string tostring(regex_t * regex, int errcode)
-{
-        ASSERT(regex != 0);
-        ASSERT(errcode != 0);
-
-        char buffer[ERROR_BUFFER_SIZE];
-
-        size_t s = regerror(errcode, regex, buffer, ERROR_BUFFER_SIZE);
-        ASSERT(s <= ERROR_BUFFER_SIZE);
-
-        return std::string(buffer);
-}
-#endif
+#include "regex.hh"
 
 std::string clean_line(const std::string & line)
 {
@@ -53,6 +32,16 @@ std::string clean_line(const std::string & line)
         return l;
 }
 
+void dump_matches(const std::string &          header,
+                  const std::list<std::string> matches)
+{
+        LDBG("Got matches on " << header << ":");
+        for (std::list<std::string>::const_iterator i = matches.begin();
+             i != matches.end();
+             i++)
+                LDBG("  " << *i);
+}
+                        
 bool parse_configuration(const std::string &                  filename,
                          std::map<std::string, std::string> & inputs,
                          std::map<std::string, std::string> & outputs,
@@ -67,30 +56,9 @@ bool parse_configuration(const std::string &                  filename,
                 return false;
         }
 
-        regex_t regex_input;
-        regex_t regex_output;
-        regex_t regex_function;
-
-        int         rc;
-        std::string regex;
-
-        regex = "define[ \t]+([a-zA-Z][a-zA-Z0-9]*)[ \t]+as[ \t]+input";
-        LDBG("Compiling regex " + quote(regex));
-        rc = regcomp(&regex_input, regex.c_str(), REG_ICASE);
-        BUG_IF(rc != 0, tostring(&regex_input, rc));
-        ASSERT(rc == 0);
-
-        regex = "define[ \t]+([a-zA-Z][a-zA-Z0-9]*)[ \t]+as[ \t]+output";
-        LDBG("Compiling regex " + quote(regex));
-        rc = regcomp(&regex_output, regex.c_str(), REG_ICASE);
-        BUG_IF(rc != 0, tostring(&regex_output, rc));
-        ASSERT(rc == 0);
-
-        regex = "if[ \t]+\\(.*\\)[ \t]+then[ \t]+set[ \t]+(.*)[ \t]+to[ \t]+(.*)";
-        LDBG("Compiling regex " + quote(regex));
-        rc = regcomp(&regex_function, regex.c_str(), REG_ICASE);
-        BUG_IF(rc != 0, tostring(&regex_output, rc));
-        ASSERT(rc == 0);
+        regex regex_input("^[ \t]*define[ \t]+([a-zA-Z_][a-zA-Z0-9_]*)[ \t]+as[ \t]+input[ \t]*$");
+        regex regex_output("^[ \t]*define[ \t]+([a-zA-Z_][a-zA-Z0-9_]*)[ \t]+as[ \t]+output[ \t]*$");
+        regex regex_function("^[ \t]*if[ \t]+\\((.*)\\)[ \t]+then[ \t]+set[ \t]+(.*)[ \t]+to[ \t]+(.*)[ \t]*$");
 
         bool error = false;
         while (!ifs.eof() && !error) {
@@ -106,39 +74,29 @@ bool parse_configuration(const std::string &                  filename,
                         continue;
                 }
 
-#if HAVE_REGEX_H
-#define REGEX_MAX_MATCHES 5
+                std::list<std::string> matches;
 
-                regmatch_t matches[REGEX_MAX_MATCHES];
-
-                if (regexec(&regex_input,
-                            line.c_str(),
-                            REGEX_MAX_MATCHES,
-                            matches,
-                            0) == 0) {
-                        LDBG("Got match on input");
-                } else if (regexec(&regex_output,
-                            line.c_str(),
-                            REGEX_MAX_MATCHES,
-                            matches,
-                            0) == 0) {
-                        LDBG("Got match on output");
-                } else if (regexec(&regex_function,
-                            line.c_str(),
-                            REGEX_MAX_MATCHES,
-                            matches,
-                            0) == 0) {
-                        LDBG("Got match on function");
-                } else {
-                        LERR("Unknown line " + quote(line));
-                        error = true;
+                matches = regex_input.matches(line);
+                if (!matches.empty()) {
+                        dump_matches("input", matches);
+                        continue;
                 }
-#endif
-        }
 
-        regfree(&regex_input);
-        regfree(&regex_output);
-        regfree(&regex_function);
+                matches = regex_output.matches(line);
+                if (!matches.empty()) {
+                        dump_matches("output", matches);
+                        continue;
+                }
+
+                matches = regex_function.matches(line);
+                if (!matches.empty()) {
+                        dump_matches("function", matches);
+                        continue;
+                }
+
+                LERR("Unknown line " << quote(line));
+                error = true;
+        }
 
         if (error)
                 return false;
