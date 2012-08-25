@@ -58,6 +58,8 @@ AC_CHECK_HEADER([regex.h],[
     AC_MSG_ERROR([Your system seems to be missing of regex.h header])
 ])
 
+AX_CHECK_POSIX_REGCOMP
+
 AC_CHECK_HEADER([execinfo.h],[
     AC_DEFINE([HAVE_EXECINFO_H], 1,
               [Define to 1 if you have <execinfo.h>.])
