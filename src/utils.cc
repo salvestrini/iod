@@ -61,7 +61,7 @@ void bug(const std::string & file,
                         LCRT("  " << *i);
         } else {
 #if HAVE_BACKTRACE && HAVE_BACKTRACE_SYMBOLS
-                LWRN("Backtrace is missing ...");
+                LWRN("Backtrace is empty ...");
 #else
                 LWRN("Backtrace support is missing");
 #endif
