@@ -6,7 +6,7 @@
 
 #include <sstream>
 #include <cstdlib>
-#include <list>
+#include <vector>
 #include <string>
 
 #if HAVE_EXECINFO_H
@@ -19,9 +19,9 @@
 
 #define MAX_BACKTRACE_FRAMES 200
 
-std::list<std::string> backtrace()
+std::vector<std::string> backtrace()
 {
-        std::list<std::string> tmp;
+        std::vector<std::string> tmp;
 
 #if HAVE_BACKTRACE && HAVE_BACKTRACE_SYMBOLS
         void *  array[MAX_BACKTRACE_FRAMES];
@@ -52,16 +52,16 @@ void bug(const std::string & file,
         LCRT("A bug has been detected in "
              << file << ":" << line << ": " << message);
 
-        LCRT("");
-        std::list<std::string> tmp(backtrace());
+        std::vector<std::string> tmp(backtrace());
         if (tmp.size() != 0) {
+                LCRT("");
                 LCRT("Backtrace (" << tmp.size() << " stack frames):");
-                for (std::list<std::string>::const_iterator iter = tmp.begin();
-                     iter != tmp.end();
-                     iter++)
-                        LCRT("  " << *iter);
+                for (std::vector<std::string>::const_iterator i = tmp.begin();
+                     i != tmp.end();
+                     i++)
+                        LCRT("  " << *i);
+                LCRT("");
         }
-        LCRT("");
 
         LCRT("Please report this bug to <" << PACKAGE_BUGREPORT << ">");
 
