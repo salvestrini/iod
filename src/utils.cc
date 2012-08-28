@@ -11,7 +11,6 @@
 
 #if HAVE_EXECINFO_H
 #include <execinfo.h>
-#include <stdlib.h>
 #endif
 
 #include "utils.hh"
