@@ -38,8 +38,6 @@ std::vector<std::string> backtrace()
 
                 free(strings);
         }
-#else
-        LWRN("Backtrace support is not available ...");
 #endif
 
         return tmp;
@@ -53,15 +51,22 @@ void bug(const std::string & file,
              << file << ":" << line << ": " << message);
 
         std::vector<std::string> tmp(backtrace());
+
+        LCRT("");
         if (tmp.size() != 0) {
-                LCRT("");
                 LCRT("Backtrace (" << tmp.size() << " stack frames):");
                 for (std::vector<std::string>::const_iterator i = tmp.begin();
                      i != tmp.end();
                      i++)
                         LCRT("  " << *i);
-                LCRT("");
+        } else {
+#if HAVE_BACKTRACE && HAVE_BACKTRACE_SYMBOLS
+                LWRN("Backtrace is missing ...");
+#else
+                LWRN("Backtrace support is missing");
+#endif
         }
+        LCRT("");
 
         LCRT("Please report this bug to <" << PACKAGE_BUGREPORT << ">");
 
