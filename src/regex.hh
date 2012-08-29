@@ -15,21 +15,19 @@
 #include <vector>
 #include <string>
 
-#define REGEX_MAX_MATCHES 5
-
 class regex {
 public:
         regex(const char *);
         regex(const std::string & expression);
         virtual ~regex();
 
-        std::vector<std::string> matches(const std::string & input);
+        std::vector<std::string> matches(const std::string & input,
+                                         size_t              mcount);
 
 private:
         void compile(const char * expression);
 
         regex_t    buffer_;
-        regmatch_t matches_[REGEX_MAX_MATCHES];
 };
 
 #endif

@@ -66,7 +66,7 @@ bool parse_configuration(const std::string &     filename,
 
                 std::vector<std::string> matches;
 
-                matches = regex_input.matches(line);
+                matches = regex_input.matches(line, 2);
                 if (!matches.empty()) {
                         ASSERT(matches.size() == 2);
 
@@ -83,7 +83,7 @@ bool parse_configuration(const std::string &     filename,
                         continue;
                 }
 
-                matches = regex_output.matches(line);
+                matches = regex_output.matches(line, 2);
                 if (!matches.empty()) {
                         ASSERT(matches.size() == 2);
 
@@ -100,7 +100,7 @@ bool parse_configuration(const std::string &     filename,
                         continue;
                 }
 
-                matches = regex_function.matches(line);
+                matches = regex_function.matches(line, 4);
                 if (!matches.empty()) {
                         ASSERT(matches.size() == 4);
 
